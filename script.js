@@ -4,7 +4,6 @@ const loanForm = document.getElementById('loanForm');
 const clientList = document.getElementById('clientList');
 const searchInput = document.getElementById('searchInput');
 
-// Guardar nuevo préstamo
 loanForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const nombre = document.getElementById('nombre').value.trim();
@@ -22,7 +21,6 @@ loanForm.addEventListener('submit', (e) => {
   loanForm.reset();
 });
 
-// Registrar un abono/pago
 function registrarPago(id) {
   const abono = parseFloat(prompt("Ingrese el monto del abono o pago:"));
   if (isNaN(abono) || abono <= 0) return;
@@ -37,7 +35,6 @@ function registrarPago(id) {
   guardarYRenderizar();
 }
 
-// Eliminar registro
 function eliminarCliente(id) {
   if (confirm("¿Estás seguro de eliminar este registro?")) {
     clientes = clientes.filter(c => c.id !== id);
@@ -45,7 +42,6 @@ function eliminarCliente(id) {
   }
 }
 
-// Filtro del Buscador en tiempo real
 searchInput.addEventListener('input', (e) => {
   const texto = e.target.value.toLowerCase();
   const filtrados = clientes.filter(c => c.nombre.toLowerCase().includes(texto));
@@ -58,40 +54,68 @@ function guardarYRenderizar() {
   actualizarResumen();
 }
 
-// Renderizar Tabla de Clientes
 function renderizarTabla(lista) {
   clientList.innerHTML = '';
+
+  if (lista.length === 0) {
+    const trVacio = document.createElement('tr');
+    const tdVacio = document.createElement('td');
+    tdVacio.colSpan = 6;
+    tdVacio.className = 'p-6 text-center text-slate-500';
+    tdVacio.textContent = 'No hay registros para mostrar';
+    trVacio.appendChild(tdVacio);
+    clientList.appendChild(trVacio);
+    return;
+  }
+
   lista.forEach(c => {
     const pendiente = c.monto - c.pagado;
     const tr = document.createElement('tr');
-    tr.className = 'border-b hover:bg-gray-50';
+    tr.className = 'hover:bg-slate-700/50';
 
     const tdNombre = document.createElement('td');
-    tdNombre.className = 'p-3 font-semibold';
+    tdNombre.className = 'p-4 font-semibold text-white';
     tdNombre.textContent = c.nombre;
 
+    const tdEstado = document.createElement('td');
+    tdEstado.className = 'p-4';
+    const badge = document.createElement('span');
+    badge.className = 'px-2 py-1 rounded-full text-xs font-semibold ';
+    
+    if (pendiente <= 0) {
+      badge.className += 'bg-emerald-500/20 text-emerald-400';
+      badge.textContent = 'Pagado';
+    } else if (c.pagado > 0) {
+      badge.className += 'bg-amber-500/20 text-amber-400';
+      badge.textContent = 'Abonando';
+    } else {
+      badge.className += 'bg-rose-500/20 text-rose-400';
+      badge.textContent = 'Pendiente';
+    }
+    tdEstado.appendChild(badge);
+
     const tdMonto = document.createElement('td');
-    tdMonto.className = 'p-3 text-blue-600';
+    tdMonto.className = 'p-4 text-slate-300';
     tdMonto.textContent = '$' + c.monto.toLocaleString();
 
     const tdPagado = document.createElement('td');
-    tdPagado.className = 'p-3 text-green-600';
+    tdPagado.className = 'p-4 text-emerald-400 font-medium';
     tdPagado.textContent = '$' + c.pagado.toLocaleString();
 
     const tdPendiente = document.createElement('td');
-    tdPendiente.className = 'p-3 font-bold ' + (pendiente > 0 ? 'text-red-600' : 'text-gray-400');
-    tdPendiente.textContent = '$' + pendiente.toLocaleString();
+    tdPendiente.className = 'p-4 font-bold ' + (pendiente > 0 ? 'text-rose-400' : 'text-slate-500');
+    tdPendiente.textContent = '$' + (pendiente < 0 ? 0 : pendiente).toLocaleString();
 
     const tdAcciones = document.createElement('td');
-    tdAcciones.className = 'p-3 space-x-2';
+    tdAcciones.className = 'p-4 text-center space-x-2';
 
     const btnAbonar = document.createElement('button');
-    btnAbonar.className = 'bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600';
-    btnAbonar.textContent = 'Abonar';
+    btnAbonar.className = 'bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs font-bold';
+    btnAbonar.textContent = '+ Abonar';
     btnAbonar.onclick = () => registrarPago(c.id);
 
     const btnEliminar = document.createElement('button');
-    btnEliminar.className = 'bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600';
+    btnEliminar.className = 'bg-slate-700 hover:bg-rose-600 text-slate-300 hover:text-white px-2 py-1 rounded-lg text-xs';
     btnEliminar.textContent = '✕';
     btnEliminar.onclick = () => eliminarCliente(c.id);
 
@@ -99,6 +123,7 @@ function renderizarTabla(lista) {
     tdAcciones.appendChild(btnEliminar);
 
     tr.appendChild(tdNombre);
+    tr.appendChild(tdEstado);
     tr.appendChild(tdMonto);
     tr.appendChild(tdPagado);
     tr.appendChild(tdPendiente);
@@ -111,10 +136,11 @@ function renderizarTabla(lista) {
 function actualizarResumen() {
   const totalP = clientes.reduce((acc, c) => acc + c.monto, 0);
   const totalC = clientes.reduce((acc, c) => acc + c.pagado, 0);
+  const pendiente = totalP - totalC;
   
   document.getElementById('totalPrestado').textContent = '$' + totalP.toLocaleString();
   document.getElementById('totalCobrado').textContent = '$' + totalC.toLocaleString();
-  document.getElementById('totalPendiente').textContent = '$' + (totalP - totalC).toLocaleString();
+  document.getElementById('totalPendiente').textContent = '$' + (pendiente < 0 ? 0 : pendiente).toLocaleString();
 }
 
 function exportarDatos() {
@@ -127,5 +153,4 @@ function exportarDatos() {
   downloadAnchor.remove();
 }
 
-// Inicializar
 guardarYRenderizar();
