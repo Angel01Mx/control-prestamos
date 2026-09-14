@@ -73,10 +73,12 @@ function renderizarTabla(lista) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-700/50';
 
+    // 1. CLIENTE
     const tdNombre = document.createElement('td');
     tdNombre.className = 'p-4 font-semibold text-white';
     tdNombre.textContent = c.nombre;
 
+    // 2. ESTADO
     const tdEstado = document.createElement('td');
     tdEstado.className = 'p-4';
     const badge = document.createElement('span');
@@ -94,34 +96,39 @@ function renderizarTabla(lista) {
     }
     tdEstado.appendChild(badge);
 
+    // 3. PRESTADO
     const tdMonto = document.createElement('td');
-    tdMonto.className = 'p-4 text-slate-300';
+    tdMonto.className = 'p-4 text-slate-300 font-medium';
     tdMonto.textContent = '$' + c.monto.toLocaleString();
 
+    // 4. PAGADO (ABONOS)
     const tdPagado = document.createElement('td');
     tdPagado.className = 'p-4 text-emerald-400 font-medium';
     tdPagado.textContent = '$' + c.pagado.toLocaleString();
 
+    // 5. PENDIENTE
     const tdPendiente = document.createElement('td');
     tdPendiente.className = 'p-4 font-bold ' + (pendiente > 0 ? 'text-rose-400' : 'text-slate-500');
     tdPendiente.textContent = '$' + (pendiente < 0 ? 0 : pendiente).toLocaleString();
 
+    // 6. ACCIONES
     const tdAcciones = document.createElement('td');
     tdAcciones.className = 'p-4 text-center space-x-2';
 
     const btnAbonar = document.createElement('button');
-    btnAbonar.className = 'bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs font-bold';
-    btnAbonar.textContent = '+ Abonar';
+    btnAbonar.className = 'bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs font-bold transition';
+    btnAbonar.textContent = 'Abonar';
     btnAbonar.onclick = () => registrarPago(c.id);
 
     const btnEliminar = document.createElement('button');
-    btnEliminar.className = 'bg-slate-700 hover:bg-rose-600 text-slate-300 hover:text-white px-2 py-1 rounded-lg text-xs';
+    btnEliminar.className = 'bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded-lg text-xs transition';
     btnEliminar.textContent = '✕';
     btnEliminar.onclick = () => eliminarCliente(c.id);
 
     tdAcciones.appendChild(btnAbonar);
     tdAcciones.appendChild(btnEliminar);
 
+    // Insertar en orden estricto de la tabla
     tr.appendChild(tdNombre);
     tr.appendChild(tdEstado);
     tr.appendChild(tdMonto);
