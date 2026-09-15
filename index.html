@@ -43,14 +43,22 @@
 
     <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-lg">
       <h2 class="text-lg font-bold text-white mb-4">Registrar Nuevo Préstamo</h2>
-      <form id="loanForm" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <form id="loanForm" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div class="md:col-span-2">
           <label class="text-xs text-slate-400 mb-1 block">Cliente</label>
           <input type="text" id="nombre" placeholder="Nombre completo" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
         </div>
         <div>
+          <label class="text-xs text-slate-400 mb-1 block">Teléfono</label>
+          <input type="tel" id="telefono" placeholder="Ej: 5512345678" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+        </div>
+        <div>
           <label class="text-xs text-slate-400 mb-1 block">Fecha Préstamo</label>
           <input type="date" id="fechaInicio" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs text-slate-400 mb-1 block">Dirección / Domicilio</label>
+          <input type="text" id="direccion" placeholder="Calle, número, colonia" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
         </div>
         <div>
           <label class="text-xs text-slate-400 mb-1 block">Frecuencia</label>
@@ -66,11 +74,11 @@
           <label class="text-xs text-slate-400 mb-1 block">Monto Entregado ($)</label>
           <input type="number" id="montoEntregado" placeholder="Ej: 5000" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
         </div>
-        <div class="md:col-span-2 lg:col-span-2">
+        <div>
           <label class="text-xs text-slate-400 mb-1 block">Total a Cobrar ($)</label>
           <input type="number" id="montoTotal" placeholder="Ej: 6000" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
         </div>
-        <div class="md:col-span-1 lg:col-span-3 flex items-end">
+        <div class="md:col-span-3 lg:col-span-4 flex items-end">
           <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold p-3 rounded-xl shadow-lg transition">
             Guardar Préstamo
           </button>
@@ -86,7 +94,7 @@
         <table class="w-full text-left">
           <thead>
             <tr class="bg-slate-900 text-slate-400 text-xs uppercase border-b border-slate-700">
-              <th class="p-4">Cliente / Inicio</th>
+              <th class="p-4">Cliente / Contacto</th>
               <th class="p-4">Frecuencia</th>
               <th class="p-4">Estado</th>
               <th class="p-4">Total a Cobrar</th>
