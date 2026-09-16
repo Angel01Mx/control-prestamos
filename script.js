@@ -14,66 +14,77 @@ document.addEventListener('DOMContentLoaded', function () {
   var debtorsList = document.getElementById('debtorsList');
   var totalDisplay = document.getElementById('totalDisplay');
 
-  var loans = JSON.parse(localStorage.getItem('loans_data')) || [];
+  var loans = [];
+  try {
+    loans = JSON.parse(localStorage.getItem('loans_data')) || [];
+  } catch (err) {
+    loans = [];
+  }
+
   var activeLoanId = null;
 
   var today = new Date().toISOString().split('T')[0];
-  document.getElementById('startDate').value = today;
-  document.getElementById('paymentDate').value = today;
+  if (document.getElementById('startDate')) document.getElementById('startDate').value = today;
+  if (document.getElementById('paymentDate')) document.getElementById('paymentDate').value = today;
 
-  openFormBtn.addEventListener('click', function () { formModal.classList.add('active'); });
-  closeFormBtn.addEventListener('click', function () { formModal.classList.remove('active'); });
-  closeDetailBtn.addEventListener('click', function () { detailModal.classList.remove('active'); });
-  openPaymentBtn.addEventListener('click', function () { paymentModal.classList.add('active'); });
-  closePaymentBtn.addEventListener('click', function () { paymentModal.classList.remove('active'); });
+  if (openFormBtn) openFormBtn.addEventListener('click', function () { formModal.classList.add('active'); });
+  if (closeFormBtn) closeFormBtn.addEventListener('click', function () { formModal.classList.remove('active'); });
+  if (closeDetailBtn) closeDetailBtn.addEventListener('click', function () { detailModal.classList.remove('active'); });
+  if (openPaymentBtn) openPaymentBtn.addEventListener('click', function () { paymentModal.classList.add('active'); });
+  if (closePaymentBtn) closePaymentBtn.addEventListener('click', function () { paymentModal.classList.remove('active'); });
 
-  loanForm.addEventListener('submit', function (e) {
-    e.preventDefault();
+  if (loanForm) {
+    loanForm.addEventListener('submit', function (e) {
+      e.preventDefault();
 
-    var amount = parseFloat(document.getElementById('amount').value);
-    var interest = parseFloat(document.getElementById('interest').value) || 0;
-    var totalToPay = amount + (amount * (interest / 100));
+      var amount = parseFloat(document.getElementById('amount').value) || 0;
+      var interest = parseFloat(document.getElementById('interest').value) || 0;
+      var totalToPay = amount + (amount * (interest / 100));
 
-    var newLoan = {
-      id: Date.now(),
-      clientName: document.getElementById('clientName').value,
-      amount: amount,
-      interest: interest,
-      totalToPay: totalToPay,
-      balance: totalToPay,
-      term: document.getElementById('term').value,
-      startDate: document.getElementById('startDate').value,
-      notes: document.getElementById('notes').value || 'Sin notas',
-      payments: []
-    };
+      var newLoan = {
+        id: Date.now(),
+        clientName: document.getElementById('clientName').value,
+        amount: amount,
+        interest: interest,
+        totalToPay: totalToPay,
+        balance: totalToPay,
+        term: document.getElementById('term').value || '1',
+        startDate: document.getElementById('startDate').value || today,
+        notes: document.getElementById('notes').value || 'Sin notas',
+        payments: []
+      };
 
-    loans.push(newLoan);
-    saveAndRefresh();
-    loanForm.reset();
-    document.getElementById('startDate').value = today;
-    formModal.classList.remove('active');
-  });
-
-  paymentForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var pAmount = parseFloat(document.getElementById('paymentAmount').value);
-    var pDate = document.getElementById('paymentDate').value;
-
-    loans = loans.map(function (loan) {
-      if (loan.id === activeLoanId) {
-        if (!loan.payments) loan.payments = [];
-        loan.payments.push({ amount: pAmount, date: pDate });
-        loan.balance = Math.max(0, loan.balance - pAmount);
-        openDetail(loan);
-      }
-      return loan;
+      loans.push(newLoan);
+      saveAndRefresh();
+      loanForm.reset();
+      document.getElementById('startDate').value = today;
+      formModal.classList.remove('active');
     });
+  }
 
-    saveAndRefresh();
-    paymentForm.reset();
-    document.getElementById('paymentDate').value = today;
-    paymentModal.classList.remove('active');
-  });
+  if (paymentForm) {
+    paymentForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var pAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+      var pDate = document.getElementById('paymentDate').value || today;
+
+      loans = loans.map(function (loan) {
+        if (loan.id === activeLoanId) {
+          if (!loan.payments) loan.payments = [];
+          loan.payments.push({ amount: pAmount, date: pDate });
+          var currentBal = loan.balance !== undefined ? loan.balance : loan.totalToPay;
+          loan.balance = Math.max(0, currentBal - pAmount);
+          openDetail(loan);
+        }
+        return loan;
+      });
+
+      saveAndRefresh();
+      paymentForm.reset();
+      document.getElementById('paymentDate').value = today;
+      paymentModal.classList.remove('active');
+    });
+  }
 
   function saveAndRefresh() {
     localStorage.setItem('loans_data', JSON.stringify(loans));
@@ -81,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderList() {
+    if (!debtorsList) return;
     debtorsList.innerHTML = '';
     var totalAcumulado = 0;
 
@@ -91,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
       emptyMsg.style.marginTop = '30px';
       emptyMsg.textContent = 'Sin deudas registradas.';
       debtorsList.appendChild(emptyMsg);
-      totalDisplay.textContent = '$0.00';
+      if (totalDisplay) totalDisplay.textContent = '$0.00';
       return;
     }
 
@@ -128,14 +140,16 @@ document.addEventListener('DOMContentLoaded', function () {
       debtorsList.appendChild(card);
     });
 
-    totalDisplay.textContent = '$' + totalAcumulado.toFixed(2);
+    if (totalDisplay) totalDisplay.textContent = '$' + totalAcumulado.toFixed(2);
   }
 
   function openDetail(loan) {
     activeLoanId = loan.id;
-    document.getElementById('detailName').textContent = loan.clientName;
+    var detailName = document.getElementById('detailName');
+    if (detailName) detailName.textContent = loan.clientName;
     
     var body = document.getElementById('detailBody');
+    if (!body) return;
     body.innerHTML = '';
 
     var currentBalance = loan.balance !== undefined ? loan.balance : loan.totalToPay;
@@ -168,32 +182,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var pList = document.getElementById('paymentsList');
-    pList.innerHTML = '';
+    if (pList) {
+      pList.innerHTML = '';
+      if (!loan.payments || loan.payments.length === 0) {
+        var noPaymentsMsg = document.createElement('p');
+        noPaymentsMsg.style.fontSize = '13px';
+        noPaymentsMsg.style.color = '#888';
+        noPaymentsMsg.textContent = 'No hay abonos registrados.';
+        pList.appendChild(noPaymentsMsg);
+      } else {
+        loan.payments.forEach(function (p) {
+          var pDiv = document.createElement('div');
+          pDiv.className = 'payment-item';
+          
+          var dateSpan = document.createElement('span');
+          dateSpan.textContent = p.date;
+          
+          var amtStrong = document.createElement('strong');
+          amtStrong.textContent = '+$' + p.amount.toFixed(2);
 
-    if (!loan.payments || loan.payments.length === 0) {
-      var noPaymentsMsg = document.createElement('p');
-      noPaymentsMsg.style.fontSize = '13px';
-      noPaymentsMsg.style.color = '#888';
-      noPaymentsMsg.textContent = 'No hay abonos registrados.';
-      pList.appendChild(noPaymentsMsg);
-    } else {
-      loan.payments.forEach(function (p) {
-        var pDiv = document.createElement('div');
-        pDiv.className = 'payment-item';
-        
-        var dateSpan = document.createElement('span');
-        dateSpan.textContent = p.date;
-        
-        var amtStrong = document.createElement('strong');
-        amtStrong.textContent = '+$' + p.amount.toFixed(2);
-
-        pDiv.appendChild(dateSpan);
-        pDiv.appendChild(amtStrong);
-        pList.appendChild(pDiv);
-      });
+          pDiv.appendChild(dateSpan);
+          pDiv.appendChild(amtStrong);
+          pList.appendChild(pDiv);
+        });
+      }
     }
 
-    detailModal.classList.add('active');
+    if (detailModal) detailModal.classList.add('active');
   }
 
   renderList();
