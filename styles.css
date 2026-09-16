@@ -207,3 +207,6 @@ body {
 .payment-item strong {
   color: #2e7d32;
 }
+#paymentModal {
+  z-index: 150;
+}
