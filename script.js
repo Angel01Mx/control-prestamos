@@ -1,7 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
-  var loans = JSON.parse(localStorage.getItem('loans_data')) || [];
-  var activeLoanId = null;
+  var loans = [];
+  
+  // Cargar y limpiar datos corrompidos automáticamente
+  try {
+    var rawData = JSON.parse(localStorage.getItem('loans_data')) || [];
+    loans = rawData.filter(function (item) {
+      return item && typeof item === 'object';
+    });
+  } catch (e) {
+    loans = [];
+  }
 
+  var activeLoanId = null;
   var today = new Date().toISOString().split('T')[0];
 
   function getVal(id) {
@@ -92,7 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loans[i].id === activeLoanId) {
           if (!loans[i].payments) loans[i].payments = [];
           loans[i].payments.push({ amount: pAmount, date: pDate });
-          var bal = loans[i].balance !== undefined ? loans[i].balance : loans[i].totalToPay;
+          var bal = loans[i].balance !== undefined && loans[i].balance !== null ? loans[i].balance : loans[i].totalToPay;
+          bal = parseFloat(bal) || 0;
           loans[i].balance = Math.max(0, bal - pAmount);
           openDetail(loans[i]);
           break;
@@ -109,6 +120,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function saveData() {
     localStorage.setItem('loans_data', JSON.stringify(loans));
+  }
+
+  function parseSafeNumber(val) {
+    var n = parseFloat(val);
+    return isNaN(n) ? 0 : n;
   }
 
   function renderList() {
@@ -131,7 +147,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     loans.forEach(function (item) {
-      var bal = item.balance !== undefined ? item.balance : item.totalToPay;
+      var rawBal = item.balance !== undefined && item.balance !== null ? item.balance : item.totalToPay;
+      var bal = parseSafeNumber(rawBal);
       totalAcumulado += bal;
 
       var card = document.createElement('div');
@@ -140,11 +157,11 @@ document.addEventListener('DOMContentLoaded', function () {
       var left = document.createElement('div');
       var name = document.createElement('div');
       name.className = 'debtor-name';
-      name.textContent = item.clientName;
+      name.textContent = item.clientName || 'Sin Nombre';
 
       var sub = document.createElement('div');
       sub.className = 'debtor-sub';
-      sub.textContent = 'Pendiente | Inicio: ' + item.startDate;
+      sub.textContent = 'Pendiente | Inicio: ' + (item.startDate || today);
 
       left.appendChild(name);
       left.appendChild(sub);
@@ -169,19 +186,23 @@ document.addEventListener('DOMContentLoaded', function () {
   function openDetail(loan) {
     activeLoanId = loan.id;
     var detailName = document.getElementById('detailName');
-    if (detailName) detailName.textContent = loan.clientName;
+    if (detailName) detailName.textContent = loan.clientName || 'Detalle del Deudor';
 
     var body = document.getElementById('detailBody');
     if (body) {
       body.innerHTML = '';
-      var bal = loan.balance !== undefined ? loan.balance : loan.totalToPay;
+      var rawBal = loan.balance !== undefined && loan.balance !== null ? loan.balance : loan.totalToPay;
+      var bal = parseSafeNumber(rawBal);
+      var origAmount = parseSafeNumber(loan.amount);
+      var totalToPay = parseSafeNumber(loan.totalToPay);
+
       var rows = [
-        ['Monto Original:', '$' + loan.amount.toFixed(2)],
-        ['Total con Interes:', '$' + loan.totalToPay.toFixed(2)],
+        ['Monto Original:', '$' + origAmount.toFixed(2)],
+        ['Total con Interes:', '$' + totalToPay.toFixed(2)],
         ['Saldo Restante:', '$' + bal.toFixed(2)],
-        ['Plazo:', loan.term + ' Semanas'],
-        ['Inicio:', loan.startDate],
-        ['Notas:', loan.notes]
+        ['Plazo:', (loan.term || '1') + ' Semanas'],
+        ['Inicio:', loan.startDate || today],
+        ['Notas:', loan.notes || 'Sin notas']
       ];
 
       rows.forEach(function (r, idx) {
@@ -219,10 +240,10 @@ document.addEventListener('DOMContentLoaded', function () {
           pDiv.className = 'payment-item';
 
           var span = document.createElement('span');
-          span.textContent = p.date;
+          span.textContent = p.date || today;
 
           var st = document.createElement('strong');
-          st.textContent = '+$' + p.amount.toFixed(2);
+          st.textContent = '+$' + parseSafeNumber(p.amount).toFixed(2);
 
           pDiv.appendChild(span);
           pDiv.appendChild(st);
