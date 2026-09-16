@@ -42,7 +42,6 @@ body {
   gap: 12px;
 }
 
-/* Tarjeta del Deudor */
 .card-debtor {
   background: white;
   padding: 16px;
@@ -75,10 +74,9 @@ body {
   text-align: right;
   font-size: 18px;
   font-weight: bold;
-  color: #2e7d32;
+  color: #d32f2f;
 }
 
-/* FAB Botón + */
 .fab {
   position: fixed;
   bottom: 24px;
@@ -95,7 +93,6 @@ body {
   z-index: 50;
 }
 
-/* Modales Flotantes / Pantalla Completa */
 .fullscreen-modal {
   position: fixed;
   top: 0;
@@ -169,8 +166,7 @@ body {
 }
 
 .primary-btn {
-  margin-top: auto;
-  padding: 16px;
+  padding: 14px;
   background: #42b72a;
   color: white;
   border: none;
@@ -178,12 +174,36 @@ body {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  width: 100%;
 }
 
-/* Detalle Info */
 .info-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.section-title {
+  margin-top: 10px;
+  font-size: 15px;
+  color: #4b4f56;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f7f8fa;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.payment-item span {
+  color: #65676b;
+}
+
+.payment-item strong {
+  color: #2e7d32;
 }
