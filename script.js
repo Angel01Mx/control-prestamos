@@ -1,4 +1,5 @@
 let clientes = JSON.parse(localStorage.getItem('prestamos_data')) || [];
+let clienteSeleccionadoId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   const fechaInput = document.getElementById('fechaInicio');
@@ -66,34 +67,60 @@ function registrarAbono(id) {
   guardarYRenderizar();
 }
 
+// NUEVAS FUNCIONES PARA EL MODAL DE HISTORIAL
 function verHistorial(id) {
   const c = clientes.find(item => item.id === id);
-  if (!c || !c.historialPagos || c.historialPagos.length === 0) {
-    alert("Este cliente aún no registra abonos.");
-    return;
-  }
+  if (!c) return;
 
-  let msg = `Historial de abonos de ${c.nombre}:\n\n`;
-  c.historialPagos.forEach((p, idx) => {
-    msg += `${idx + 1}. $${p.monto.toLocaleString()} - ${p.fecha}\n`;
-  });
-  msg += `\n¿Deseas eliminar algún abono por equivocación? Ingresa el número del abono (1, 2, 3...) o presiona Cancelar:`;
+  clienteSeleccionadoId = id;
+  const modal = document.getElementById('modalHistorial');
+  const titulo = document.getElementById('modalClienteNombre');
+  const contenedorLista = document.getElementById('modalHistorialLista');
 
-  const seleccion = prompt(msg);
-  if (!seleccion) return;
+  titulo.textContent = `Abonos de: ${c.nombre}`;
+  contenedorLista.innerHTML = '';
 
-  const index = parseInt(seleccion) - 1;
-  if (!isNaN(index) && index >= 0 && index < c.historialPagos.length) {
-    const abonoAEliminar = c.historialPagos[index];
-    if (confirm(`¿Eliminar el abono de $${abonoAEliminar.monto.toLocaleString()}?`)) {
-      c.pagado -= abonoAEliminar.monto;
-      c.historialPagos.splice(index, 1);
-      guardarYRenderizar();
-      alert("Abono eliminado correctamente.");
-    }
+  if (!c.historialPagos || c.historialPagos.length === 0) {
+    contenedorLista.innerHTML = `<p class="text-sm text-slate-400 py-4 text-center">Sin abonos registrados.</p>`;
   } else {
-    alert("Número de abono no válido.");
+    c.historialPagos.forEach((p, idx) => {
+      const item = document.createElement('div');
+      item.className = 'flex items-center justify-between p-3 bg-slate-900/60 rounded-xl border border-slate-700/50';
+      
+      item.innerHTML = `
+        <div>
+          <p class="font-bold text-emerald-400">$${p.monto.toLocaleString()}</p>
+          <p class="text-xs text-slate-400">${p.fecha}</p>
+        </div>
+        <button onclick="eliminarAbonoDirecto(${idx})" 
+                class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-2 py-1 rounded-lg text-xs font-medium transition">
+          🗑️ Eliminar
+        </button>
+      `;
+      contenedorLista.appendChild(item);
+    });
   }
+
+  modal.classList.remove('hidden');
+}
+
+function eliminarAbonoDirecto(index) {
+  const c = clientes.find(item => item.id === clienteSeleccionadoId);
+  if (!c || !c.historialPagos[index]) return;
+
+  const abonoAEliminar = c.historialPagos[index];
+  
+  if (confirm(`¿Eliminar este abono de $${abonoAEliminar.monto.toLocaleString()}?`)) {
+    c.pagado -= abonoAEliminar.monto;
+    c.historialPagos.splice(index, 1);
+    guardarYRenderizar();
+    verHistorial(clienteSeleccionadoId); // Recarga la lista dentro del modal
+  }
+}
+
+function cerrarModalHistorial() {
+  document.getElementById('modalHistorial').classList.add('hidden');
+  clienteSeleccionadoId = null;
 }
 
 function eliminarCliente(id) {
@@ -124,7 +151,6 @@ function renderizarTabla() {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-800/50 transition border-b border-slate-700/50';
 
-    // Cliente, Teléfono, Dirección y Fecha
     const tdCliente = document.createElement('td');
     tdCliente.className = 'p-4';
     
@@ -144,12 +170,10 @@ function renderizarTabla() {
     if (c.telefono || c.direccion) tdCliente.appendChild(divContacto);
     tdCliente.appendChild(divFecha);
 
-    // Frecuencia
     const tdFrecuencia = document.createElement('td');
     tdFrecuencia.className = 'p-4 text-slate-300';
     tdFrecuencia.textContent = c.frecuencia;
 
-    // Estado
     const tdEstado = document.createElement('td');
     tdEstado.className = 'p-4';
     const spanEstado = document.createElement('span');
@@ -159,7 +183,6 @@ function renderizarTabla() {
     spanEstado.textContent = pendiente <= 0 ? 'Pagado' : 'Activo';
     tdEstado.appendChild(spanEstado);
 
-    // Montos
     const tdTotal = document.createElement('td');
     tdTotal.className = 'p-4 font-medium text-white';
     tdTotal.textContent = '$' + c.montoTotal.toLocaleString();
@@ -172,7 +195,6 @@ function renderizarTabla() {
     tdPendiente.className = 'p-4 font-semibold ' + (pendiente <= 0 ? 'text-slate-500' : 'text-rose-400');
     tdPendiente.textContent = '$' + pendiente.toLocaleString();
 
-    // Botones
     const tdAcciones = document.createElement('td');
     tdAcciones.className = 'p-4 text-center space-x-2';
 
