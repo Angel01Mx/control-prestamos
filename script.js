@@ -1,31 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
   var formModal = document.getElementById('formModal');
   var detailModal = document.getElementById('detailModal');
+  var paymentModal = document.getElementById('paymentModal');
   
   var openFormBtn = document.getElementById('openFormBtn');
   var closeFormBtn = document.getElementById('closeFormBtn');
   var closeDetailBtn = document.getElementById('closeDetailBtn');
+  var openPaymentBtn = document.getElementById('openPaymentBtn');
+  var closePaymentBtn = document.getElementById('closePaymentBtn');
   
   var loanForm = document.getElementById('loanForm');
+  var paymentForm = document.getElementById('paymentForm');
   var debtorsList = document.getElementById('debtorsList');
   var totalDisplay = document.getElementById('totalDisplay');
 
   var loans = JSON.parse(localStorage.getItem('loans_data')) || [];
+  var activeLoanId = null;
 
   var today = new Date().toISOString().split('T')[0];
   document.getElementById('startDate').value = today;
+  document.getElementById('paymentDate').value = today;
 
-  openFormBtn.addEventListener('click', function () {
-    formModal.classList.add('active');
-  });
-
-  closeFormBtn.addEventListener('click', function () {
-    formModal.classList.remove('active');
-  });
-
-  closeDetailBtn.addEventListener('click', function () {
-    detailModal.classList.remove('active');
-  });
+  openFormBtn.addEventListener('click', function () { formModal.classList.add('active'); });
+  closeFormBtn.addEventListener('click', function () { formModal.classList.remove('active'); });
+  closeDetailBtn.addEventListener('click', function () { detailModal.classList.remove('active'); });
+  openPaymentBtn.addEventListener('click', function () { paymentModal.classList.add('active'); });
+  closePaymentBtn.addEventListener('click', function () { paymentModal.classList.remove('active'); });
 
   loanForm.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -40,19 +40,45 @@ document.addEventListener('DOMContentLoaded', function () {
       amount: amount,
       interest: interest,
       totalToPay: totalToPay,
+      balance: totalToPay,
       term: document.getElementById('term').value,
       startDate: document.getElementById('startDate').value,
-      notes: document.getElementById('notes').value || 'Sin notas'
+      notes: document.getElementById('notes').value || 'Sin notas',
+      payments: []
     };
 
     loans.push(newLoan);
-    localStorage.setItem('loans_data', JSON.stringify(loans));
-
-    renderList();
+    saveAndRefresh();
     loanForm.reset();
     document.getElementById('startDate').value = today;
     formModal.classList.remove('active');
   });
+
+  paymentForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pAmount = parseFloat(document.getElementById('paymentAmount').value);
+    var pDate = document.getElementById('paymentDate').value;
+
+    loans = loans.map(function (loan) {
+      if (loan.id === activeLoanId) {
+        if (!loan.payments) loan.payments = [];
+        loan.payments.push({ amount: pAmount, date: pDate });
+        loan.balance = Math.max(0, loan.balance - pAmount);
+        openDetail(loan);
+      }
+      return loan;
+    });
+
+    saveAndRefresh();
+    paymentForm.reset();
+    document.getElementById('paymentDate').value = today;
+    paymentModal.classList.remove('active');
+  });
+
+  function saveAndRefresh() {
+    localStorage.setItem('loans_data', JSON.stringify(loans));
+    renderList();
+  }
 
   function renderList() {
     debtorsList.innerHTML = '';
@@ -70,27 +96,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     loans.forEach(function (item) {
-      totalAcumulado += item.totalToPay;
+      var currentBalance = item.balance !== undefined ? item.balance : item.totalToPay;
+      totalAcumulado += currentBalance;
 
       var card = document.createElement('div');
       card.className = 'card-debtor';
 
       var infoDiv = document.createElement('div');
-      
       var nameDiv = document.createElement('div');
       nameDiv.className = 'debtor-name';
       nameDiv.textContent = item.clientName;
 
       var subDiv = document.createElement('div');
       subDiv.className = 'debtor-sub';
-      subDiv.textContent = 'Inicio: ' + item.startDate;
+      subDiv.textContent = 'Pendiente | Inicio: ' + item.startDate;
 
       infoDiv.appendChild(nameDiv);
       infoDiv.appendChild(subDiv);
 
       var amountDiv = document.createElement('div');
       amountDiv.className = 'debtor-amount';
-      amountDiv.textContent = '$' + item.totalToPay.toFixed(2);
+      amountDiv.textContent = '$' + currentBalance.toFixed(2);
 
       card.appendChild(infoDiv);
       card.appendChild(amountDiv);
@@ -106,32 +132,33 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function openDetail(loan) {
+    activeLoanId = loan.id;
     document.getElementById('detailName').textContent = loan.clientName;
     
     var body = document.getElementById('detailBody');
     body.innerHTML = '';
 
+    var currentBalance = loan.balance !== undefined ? loan.balance : loan.totalToPay;
+
     var fields = [
       { label: 'Monto Original:', value: '$' + loan.amount.toFixed(2) },
-      { label: 'Interés Aplicado:', value: loan.interest + '%' },
-      { label: 'Total a Cobrar:', value: '$' + loan.totalToPay.toFixed(2), highlight: true },
-      { label: 'Plazo Acordado:', value: loan.term + ' Semanas' },
-      { label: 'Fecha de Inicio:', value: loan.startDate },
+      { label: 'Total con Interes:', value: '$' + loan.totalToPay.toFixed(2) },
+      { label: 'Saldo Restante:', value: '$' + currentBalance.toFixed(2), highlight: true },
+      { label: 'Plazo:', value: loan.term + ' Semanas' },
+      { label: 'Inicio:', value: loan.startDate },
       { label: 'Notas:', value: loan.notes }
     ];
 
     fields.forEach(function (field) {
       var row = document.createElement('div');
       row.className = 'info-row';
-
       var span = document.createElement('span');
       span.textContent = field.label;
-
       var strong = document.createElement('strong');
       strong.textContent = field.value;
 
       if (field.highlight) {
-        strong.style.color = '#2e7d32';
+        strong.style.color = '#d32f2f';
         strong.style.fontSize = '18px';
       }
 
@@ -139,6 +166,32 @@ document.addEventListener('DOMContentLoaded', function () {
       row.appendChild(strong);
       body.appendChild(row);
     });
+
+    var pList = document.getElementById('paymentsList');
+    pList.innerHTML = '';
+
+    if (!loan.payments || loan.payments.length === 0) {
+      var noPaymentsMsg = document.createElement('p');
+      noPaymentsMsg.style.fontSize = '13px';
+      noPaymentsMsg.style.color = '#888';
+      noPaymentsMsg.textContent = 'No hay abonos registrados.';
+      pList.appendChild(noPaymentsMsg);
+    } else {
+      loan.payments.forEach(function (p) {
+        var pDiv = document.createElement('div');
+        pDiv.className = 'payment-item';
+        
+        var dateSpan = document.createElement('span');
+        dateSpan.textContent = p.date;
+        
+        var amtStrong = document.createElement('strong');
+        amtStrong.textContent = '+$' + p.amount.toFixed(2);
+
+        pDiv.appendChild(dateSpan);
+        pDiv.appendChild(amtStrong);
+        pList.appendChild(pDiv);
+      });
+    }
 
     detailModal.classList.add('active');
   }
