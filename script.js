@@ -3,22 +3,23 @@ document.addEventListener('DOMContentLoaded', function () {
   var activeLoanId = null;
 
   var today = new Date().toISOString().split('T')[0];
-  var startDateElem = document.getElementById('startDate');
-  var paymentDateElem = document.getElementById('paymentDate');
-  if (startDateElem) startDateElem.value = today;
-  if (paymentDateElem) paymentDateElem.value = today;
 
-  // Modales
+  function getVal(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+  }
+
+  function setVal(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  setVal('startDate', today);
+  setVal('paymentDate', today);
+
   var formModal = document.getElementById('formModal');
   var detailModal = document.getElementById('detailModal');
   var paymentModal = document.getElementById('paymentModal');
-
-  // Botones para abrir/cerrar
-  bindClick('openFormBtn', function () { openModal(formModal); });
-  bindClick('closeFormBtn', function () { closeModal(formModal); });
-  bindClick('closeDetailBtn', function () { closeModal(detailModal); });
-  bindClick('openPaymentBtn', function () { openModal(paymentModal); });
-  bindClick('closePaymentBtn', function () { closeModal(paymentModal); });
 
   function bindClick(id, handler) {
     var btn = document.getElementById(id);
@@ -33,18 +34,23 @@ document.addEventListener('DOMContentLoaded', function () {
     if (el) el.classList.remove('active');
   }
 
-  // Submit Préstamo
+  bindClick('openFormBtn', function () { openModal(formModal); });
+  bindClick('closeFormBtn', function () { closeModal(formModal); });
+  bindClick('closeDetailBtn', function () { closeModal(detailModal); });
+  bindClick('openPaymentBtn', function () { openModal(paymentModal); });
+  bindClick('closePaymentBtn', function () { closeModal(paymentModal); });
+
   var loanForm = document.getElementById('loanForm');
   if (loanForm) {
     loanForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var clientName = document.getElementById('clientName').value.trim();
-      var amount = parseFloat(document.getElementById('amount').value) || 0;
-      var interest = parseFloat(document.getElementById('interest').value) || 0;
-      var term = document.getElementById('term').value || '1';
-      var startDate = document.getElementById('startDate').value || today;
-      var notes = document.getElementById('notes').value || 'Sin notas';
+      var clientName = getVal('clientName').trim();
+      var amount = parseFloat(getVal('amount')) || 0;
+      var interest = parseFloat(getVal('interest')) || 0;
+      var term = getVal('term') || '1';
+      var startDate = getVal('startDate') || today;
+      var notes = getVal('notes') || 'Sin notas';
 
       if (!clientName || amount <= 0) return;
 
@@ -66,20 +72,19 @@ document.addEventListener('DOMContentLoaded', function () {
       loans.push(newLoan);
       saveData();
       loanForm.reset();
-      if (startDateElem) startDateElem.value = today;
+      setVal('startDate', today);
       closeModal(formModal);
       renderList();
     });
   }
 
-  // Submit Abono
   var paymentForm = document.getElementById('paymentForm');
   if (paymentForm) {
     paymentForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var pAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
-      var pDate = document.getElementById('paymentDate').value || today;
+      var pAmount = parseFloat(getVal('paymentAmount')) || 0;
+      var pDate = getVal('paymentDate') || today;
 
       if (pAmount <= 0) return;
 
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       saveData();
       paymentForm.reset();
-      if (paymentDateElem) paymentDateElem.value = today;
+      setVal('paymentDate', today);
       closeModal(paymentModal);
       renderList();
     });
