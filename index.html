@@ -1,562 +1,227 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Control de Préstamos</title>
-  <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
 
-body {
-  background-color: #f0f2f5;
-  color: #1c1e21;
-}
+  <script src="https://cdn.tailwindcss.com"></script>
 
-.header {
-  background: #1877f2;
-  color: white;
-  padding: 24px 20px 16px;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
-
-.total-box {
-  margin-top: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 12px 16px;
-  border-radius: 12px;
-}
-
-.total-box span {
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.total-box h2 {
-  font-size: 26px;
-  margin-top: 2px;
-}
-
-.container {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.card-debtor {
-  background: white;
-  padding: 16px;
-  border-radius: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.card-debtor:active {
-  transform: scale(0.98);
-}
-
-.debtor-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1877f2;
-}
-
-.debtor-sub {
-  font-size: 13px;
-  color: #65676b;
-  margin-top: 4px;
-}
-
-.debtor-amount {
-  text-align: right;
-  font-size: 18px;
-  font-weight: bold;
-  color: #d32f2f;
-}
-
-.fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #1877f2;
-  color: white;
-  font-size: 32px;
-  border: none;
-  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
-  cursor: pointer;
-  z-index: 50;
-}
-
-.fullscreen-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #ffffff;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.25s ease-in-out;
-}
-
-.fullscreen-modal.active {
-  transform: translateY(0);
-}
-
-#paymentModal {
-  z-index: 150;
-}
-
-.modal-bar {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #e5e5e5;
-  gap: 12px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #1877f2;
-  cursor: pointer;
-}
-
-.modal-form, .modal-content {
-  padding: 20px;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.input-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.input-field label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #4b4f56;
-}
-
-.input-field input, .input-field textarea {
-  padding: 12px 14px;
-  border: 1px solid #ccd0d5;
-  border-radius: 10px;
-  font-size: 15px;
-  background: #f5f6f7;
-}
-
-.row-inputs {
-  display: flex;
-  gap: 12px;
-}
-
-.row-inputs .input-field {
-  flex: 1;
-}
-
-.primary-btn {
-  padding: 14px;
-  background: #42b72a;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.section-title {
-  margin-top: 10px;
-  font-size: 15px;
-  color: #4b4f56;
-}
-
-.payment-item {
-  display: flex;
-  justify-content: space-between;
-  background: #f7f8fa;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-top: 6px;
-}
-
-.payment-item span {
-  color: #65676b;
-}
-
-.payment-item strong {
-  color: #2e7d32;
-}
-  </style>
 </head>
-<body>
 
-  <header class="header">
-    <h1>Mis Préstamos</h1>
-    <div class="total-box">
-      <span>Total por Cobrar</span>
-      <h2 id="totalDisplay">$0.00</h2>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+
+
+
+  <header class="bg-slate-800 border-b border-slate-700 p-4 mb-8">
+
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+
+      <div>
+
+        <h1 class="text-xl font-bold text-white tracking-wide">Control de Préstamos</h1>
+
+        <p class="text-xs text-slate-400">Administrador de cuentas y pagos</p>
+
+      </div>
+
+      <button id="btnExportar" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm border border-slate-600 text-slate-200 transition">
+
+        Respaldo
+
+      </button>
+
     </div>
+
   </header>
 
-  <main class="container" id="debtorsList"></main>
 
-  <button class="fab" id="openFormBtn">+</button>
 
-  <!-- Modal: Nuevo Préstamo -->
-  <div class="fullscreen-modal" id="formModal">
-    <div class="modal-bar">
-      <button class="icon-btn" id="closeFormBtn">✕</button>
-      <h3>Registrar Préstamo</h3>
+  <main class="max-w-6xl mx-auto px-4 space-y-6">
+
+    <div>
+
+      <input type="text" id="searchInput" placeholder="Buscar cliente por nombre..." 
+
+             class="w-full p-4 bg-slate-800 border border-slate-700 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-lg">
+
     </div>
-    
-    <form id="loanForm" class="modal-form">
-      <div class="input-field">
-        <label>Nombre del Deudor</label>
-        <input type="text" id="clientName" placeholder="Ej. Juan Pérez" required>
+
+
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-lg">
+
+        <p class="text-xs text-slate-400 font-semibold uppercase">Total a Cobrar</p>
+
+        <p id="totalPrestado" class="text-2xl font-bold text-white mt-1">$0</p>
+
       </div>
 
-      <div class="input-field">
-        <label>Monto ($)</label>
-        <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-lg">
+
+        <p class="text-xs text-slate-400 font-semibold uppercase">Total Cobrado</p>
+
+        <p id="totalCobrado" class="text-2xl font-bold text-emerald-400 mt-1">$0</p>
+
       </div>
 
-      <div class="row-inputs">
-        <div class="input-field">
-          <label>Interés (%)</label>
-          <input type="number" id="interest" value="10">
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-lg">
+
+        <p class="text-xs text-slate-400 font-semibold uppercase">Pendiente por Cobrar</p>
+
+        <p id="totalPendiente" class="text-2xl font-bold text-rose-400 mt-1">$0</p>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-lg">
+
+      <h2 class="text-lg font-bold text-white mb-4">Registrar Nuevo Préstamo</h2>
+
+      <form id="loanForm" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+        <div class="md:col-span-2">
+
+          <label class="text-xs text-slate-400 mb-1 block">Cliente</label>
+
+          <input type="text" id="nombre" placeholder="Nombre completo" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
         </div>
-        <div class="input-field">
-          <label>Plazo (Semanas)</label>
-          <input type="number" id="term" value="4">
+
+        <div>
+
+          <label class="text-xs text-slate-400 mb-1 block">Teléfono</label>
+
+          <input type="tel" id="telefono" placeholder="Ej: 5512345678" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
         </div>
-      </div>
 
-      <div class="input-field">
-        <label>Fecha de Inicio</label>
-        <input type="date" id="startDate" required>
-      </div>
+        <div>
 
-      <div class="input-field">
-        <label>Notas u Observaciones</label>
-        <textarea id="notes" rows="3" placeholder="Opcional..."></textarea>
-      </div>
+          <label class="text-xs text-slate-400 mb-1 block">Fecha Préstamo</label>
 
-      <button type="submit" class="primary-btn">Guardar Préstamo</button>
-    </form>
-  </div>
+          <input type="date" id="fechaInicio" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
 
-  <!-- Modal: Detalle del Deudor -->
-  <div class="fullscreen-modal" id="detailModal">
-    <div class="modal-bar">
-      <button class="icon-btn" id="closeDetailBtn">←</button>
-      <h3 id="detailName">Detalle del Deudor</h3>
+        </div>
+
+        <div class="md:col-span-2">
+
+          <label class="text-xs text-slate-400 mb-1 block">Dirección / Domicilio</label>
+
+          <input type="text" id="direccion" placeholder="Calle, número, colonia" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
+        </div>
+
+        <div>
+
+          <label class="text-xs text-slate-400 mb-1 block">Frecuencia</label>
+
+          <select id="frecuencia" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
+            <option value="Diario">Diario</option>
+
+            <option value="Semanal">Semanal</option>
+
+            <option value="Catorcenal">Catorcenal</option>
+
+            <option value="Quincenal">Quincenal</option>
+
+            <option value="Mensual">Mensual</option>
+
+          </select>
+
+        </div>
+
+        <div>
+
+          <label class="text-xs text-slate-400 mb-1 block">Monto Entregado ($)</label>
+
+          <input type="number" id="montoEntregado" placeholder="Ej: 5000" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
+        </div>
+
+        <div>
+
+          <label class="text-xs text-slate-400 mb-1 block">Total a Cobrar ($)</label>
+
+          <input type="number" id="montoTotal" placeholder="Ej: 6000" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white">
+
+        </div>
+
+        <div class="md:col-span-3 lg:col-span-4 flex items-end">
+
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold p-3 rounded-xl shadow-lg transition">
+
+            Guardar Préstamo
+
+          </button>
+
+        </div>
+
+      </form>
+
     </div>
-    
-    <div class="modal-content">
-      <div id="detailBody"></div>
-      
-      <div class="action-buttons">
-        <button class="primary-btn" id="openPaymentBtn">+ Registrar Abono</button>
+
+
+
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg">
+
+      <div class="p-4 border-b border-slate-700">
+
+        <h2 class="text-lg font-bold text-white">Lista de Deudores</h2>
+
       </div>
 
-      <h4 class="section-title">Historial de Abonos</h4>
-      <div id="paymentsList" class="payments-list"></div>
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-left">
+
+          <thead>
+
+            <tr class="bg-slate-900 text-slate-400 text-xs uppercase border-b border-slate-700">
+
+              <th class="p-4">Cliente / Contacto</th>
+
+              <th class="p-4">Frecuencia</th>
+
+              <th class="p-4">Estado</th>
+
+              <th class="p-4">Total a Cobrar</th>
+
+              <th class="p-4">Pagado</th>
+
+              <th class="p-4">Pendiente</th>
+
+              <th class="p-4 text-center">Acciones</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="clientList" class="divide-y divide-slate-700 text-sm"></tbody>
+
+        </table>
+
+      </div>
+
     </div>
-  </div>
 
-  <!-- Modal: Registrar Pago / Abono -->
-  <div class="fullscreen-modal" id="paymentModal">
-    <div class="modal-bar">
-      <button class="icon-btn" id="closePaymentBtn">✕</button>
-      <h3>Nuevo Abono</h3>
-    </div>
-    
-    <form id="paymentForm" class="modal-form">
-      <div class="input-field">
-        <label>Monto del Abono ($)</label>
-        <input type="number" id="paymentAmount" placeholder="0.00" step="0.01" required>
-      </div>
+  </main>
 
-      <div class="input-field">
-        <label>Fecha de Pago</label>
-        <input type="date" id="paymentDate" required>
-      </div>
 
-      <button type="submit" class="primary-btn" style="background:#1877f2;">Guardar Abono</button>
-    </form>
-  </div>
 
-  <script>
-document.addEventListener('DOMContentLoaded', function () {
-  var loans = JSON.parse(localStorage.getItem('loans_data')) || [];
-  var activeLoanId = null;
+  <script src="script.js"></script>
 
-  var today = new Date().toISOString().split('T')[0];
-  var startDateElem = document.getElementById('startDate');
-  var paymentDateElem = document.getElementById('paymentDate');
-  if (startDateElem) startDateElem.value = today;
-  if (paymentDateElem) paymentDateElem.value = today;
-
-  var formModal = document.getElementById('formModal');
-  var detailModal = document.getElementById('detailModal');
-  var paymentModal = document.getElementById('paymentModal');
-
-  bindClick('openFormBtn', function () { openModal(formModal); });
-  bindClick('closeFormBtn', function () { closeModal(formModal); });
-  bindClick('closeDetailBtn', function () { closeModal(detailModal); });
-  bindClick('openPaymentBtn', function () { openModal(paymentModal); });
-  bindClick('closePaymentBtn', function () { closeModal(paymentModal); });
-
-  function bindClick(id, handler) {
-    var btn = document.getElementById(id);
-    if (btn) btn.addEventListener('click', handler);
-  }
-
-  function openModal(el) {
-    if (el) el.classList.add('active');
-  }
-
-  function closeModal(el) {
-    if (el) el.classList.remove('active');
-  }
-
-  var loanForm = document.getElementById('loanForm');
-  if (loanForm) {
-    loanForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      var clientNameElem = document.getElementById('clientName');
-      var amountElem = document.getElementById('amount');
-      var interestElem = document.getElementById('interest');
-      var termElem = document.getElementById('term');
-      var notesElem = document.getElementById('notes');
-
-      var clientName = clientNameElem ? clientNameElem.value.trim() : '';
-      var amount = amountElem ? parseFloat(amountElem.value) || 0 : 0;
-      var interest = interestElem ? parseFloat(interestElem.value) || 0 : 0;
-      var term = termElem ? termElem.value || '1' : '1';
-      var startDate = startDateElem ? startDateElem.value || today : today;
-      var notes = notesElem ? notesElem.value || 'Sin notas' : 'Sin notas';
-
-      if (!clientName || amount <= 0) return;
-
-      var totalToPay = amount + (amount * (interest / 100));
-
-      var newLoan = {
-        id: Date.now(),
-        clientName: clientName,
-        amount: amount,
-        interest: interest,
-        totalToPay: totalToPay,
-        balance: totalToPay,
-        term: term,
-        startDate: startDate,
-        notes: notes,
-        payments: []
-      };
-
-      loans.push(newLoan);
-      saveData();
-      loanForm.reset();
-      if (startDateElem) startDateElem.value = today;
-      closeModal(formModal);
-      renderList();
-    });
-  }
-
-  var paymentForm = document.getElementById('paymentForm');
-  if (paymentForm) {
-    paymentForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      var pAmountElem = document.getElementById('paymentAmount');
-      var pAmount = pAmountElem ? parseFloat(pAmountElem.value) || 0 : 0;
-      var pDate = paymentDateElem ? paymentDateElem.value || today : today;
-
-      if (pAmount <= 0) return;
-
-      for (var i = 0; i < loans.length; i++) {
-        if (loans[i].id === activeLoanId) {
-          if (!loans[i].payments) loans[i].payments = [];
-          loans[i].payments.push({ amount: pAmount, date: pDate });
-          var bal = loans[i].balance !== undefined ? loans[i].balance : loans[i].totalToPay;
-          loans[i].balance = Math.max(0, bal - pAmount);
-          openDetail(loans[i]);
-          break;
-        }
-      }
-
-      saveData();
-      paymentForm.reset();
-      if (paymentDateElem) paymentDateElem.value = today;
-      closeModal(paymentModal);
-      renderList();
-    });
-  }
-
-  function saveData() {
-    try {
-      localStorage.setItem('loans_data', JSON.stringify(loans));
-    } catch(e){}
-  }
-
-  function renderList() {
-    var list = document.getElementById('debtorsList');
-    var totalDisplay = document.getElementById('totalDisplay');
-    if (!list) return;
-
-    list.innerHTML = '';
-    var totalAcumulado = 0;
-
-    if (loans.length === 0) {
-      var p = document.createElement('p');
-      p.style.textAlign = 'center';
-      p.style.color = '#888';
-      p.style.marginTop = '30px';
-      p.textContent = 'Sin deudas registradas.';
-      list.appendChild(p);
-      if (totalDisplay) totalDisplay.textContent = '$0.00';
-      return;
-    }
-
-    loans.forEach(function (item) {
-      var bal = item.balance !== undefined ? item.balance : item.totalToPay;
-      totalAcumulado += bal;
-
-      var card = document.createElement('div');
-      card.className = 'card-debtor';
-
-      var left = document.createElement('div');
-      var name = document.createElement('div');
-      name.className = 'debtor-name';
-      name.textContent = item.clientName;
-
-      var sub = document.createElement('div');
-      sub.className = 'debtor-sub';
-      sub.textContent = 'Pendiente | Inicio: ' + item.startDate;
-
-      left.appendChild(name);
-      left.appendChild(sub);
-
-      var right = document.createElement('div');
-      right.className = 'debtor-amount';
-      right.textContent = '$' + bal.toFixed(2);
-
-      card.appendChild(left);
-      card.appendChild(right);
-
-      card.addEventListener('click', function () {
-        openDetail(item);
-      });
-
-      list.appendChild(card);
-    });
-
-    if (totalDisplay) totalDisplay.textContent = '$' + totalAcumulado.toFixed(2);
-  }
-
-  function openDetail(loan) {
-    activeLoanId = loan.id;
-    var detailName = document.getElementById('detailName');
-    if (detailName) detailName.textContent = loan.clientName;
-
-    var body = document.getElementById('detailBody');
-    if (body) {
-      body.innerHTML = '';
-      var bal = loan.balance !== undefined ? loan.balance : loan.totalToPay;
-      var rows = [
-        ['Monto Original:', '$' + loan.amount.toFixed(2)],
-        ['Total con Interes:', '$' + loan.totalToPay.toFixed(2)],
-        ['Saldo Restante:', '$' + bal.toFixed(2)],
-        ['Plazo:', loan.term + ' Semanas'],
-        ['Inicio:', loan.startDate],
-        ['Notas:', loan.notes]
-      ];
-
-      rows.forEach(function (r, idx) {
-        var div = document.createElement('div');
-        div.className = 'info-row';
-
-        var s1 = document.createElement('span');
-        s1.textContent = r[0];
-
-        var s2 = document.createElement('strong');
-        s2.textContent = r[1];
-        if (idx === 2) {
-          s2.style.color = '#d32f2f';
-          s2.style.fontSize = '18px';
-        }
-
-        div.appendChild(s1);
-        div.appendChild(s2);
-        body.appendChild(div);
-      });
-    }
-
-    var pList = document.getElementById('paymentsList');
-    if (pList) {
-      pList.innerHTML = '';
-      if (!loan.payments || loan.payments.length === 0) {
-        var noP = document.createElement('p');
-        noP.style.fontSize = '13px';
-        noP.style.color = '#888';
-        noP.textContent = 'No hay abonos registrados.';
-        pList.appendChild(noP);
-      } else {
-        loan.payments.forEach(function (p) {
-          var pDiv = document.createElement('div');
-          pDiv.className = 'payment-item';
-
-          var span = document.createElement('span');
-          span.textContent = p.date;
-
-          var st = document.createElement('strong');
-          st.textContent = '+$' + p.amount.toFixed(2);
-
-          pDiv.appendChild(span);
-          pDiv.appendChild(st);
-          pList.appendChild(pDiv);
-        });
-      }
-    }
-
-    openModal(detailModal);
-  }
-
-  renderList();
-});
-  </script>
 </body>
+
 </html>
