@@ -8,53 +8,75 @@
 </head>
 <body>
 
-  <main class="app-content">
+  <header class="header">
     <h1>Mis Préstamos</h1>
-    <p>Presiona el botón + para registrar un nuevo préstamo.</p>
+    <div class="total-box">
+      <span>Total por Cobrar</span>
+      <h2 id="totalDisplay">$0.00</h2>
+    </div>
+  </header>
+
+  <!-- Lista de Deudores -->
+  <main class="container" id="debtorsList">
+    <!-- Las tarjetas se cargan dinámicamente -->
   </main>
 
-  <button class="fab-btn" id="openFormBtn">+</button>
+  <!-- Botón Flotante (+) -->
+  <button class="fab" id="openFormBtn">+</button>
 
-  <div class="app-modal" id="loanModal">
-    <div class="app-modal-header">
-      <button class="close-btn" id="closeFormBtn">←</button>
-      <h2>Nuevo Préstamo</h2>
+  <!-- Ventana Flotante / Modal: Nuevo Préstamo (Pantalla Completa) -->
+  <div class="fullscreen-modal" id="formModal">
+    <div class="modal-bar">
+      <button class="icon-btn" id="closeFormBtn">✕</button>
+      <h3>Registrar Préstamo</h3>
     </div>
     
-    <form id="loanForm" class="app-modal-body">
-      <div class="form-group">
-        <label for="clientName">Nombre del Deudor</label>
-        <input type="text" id="clientName" placeholder="Ej. María García" required>
+    <form id="loanForm" class="modal-form">
+      <div class="input-field">
+        <label>Nombre del Deudor</label>
+        <input type="text" id="clientName" placeholder="Ej. Juan Pérez" required>
       </div>
 
-      <div class="form-group">
-        <label for="amount">Monto Prestado</label>
-        <input type="number" id="amount" placeholder="$0.00" required>
+      <div class="input-field">
+        <label>Monto ($)</label>
+        <input type="number" id="amount" placeholder="0.00" step="0.01" required>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="interest">Interés (%)</label>
-          <input type="number" id="interest" placeholder="10%">
+      <div class="row-inputs">
+        <div class="input-field">
+          <label>Interés (%)</label>
+          <input type="number" id="interest" value="10">
         </div>
-        <div class="form-group">
-          <label for="term">Plazo</label>
-          <input type="number" id="term" placeholder="4 semanas">
+        <div class="input-field">
+          <label>Plazo (Semanas)</label>
+          <input type="number" id="term" value="4">
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="startDate">Fecha de Inicio</label>
+      <div class="input-field">
+        <label>Fecha de Inicio</label>
         <input type="date" id="startDate" required>
       </div>
 
-      <div class="form-group">
-        <label for="notes">Notas / Condiciones</label>
-        <textarea id="notes" rows="3" placeholder="Detalles opcionales..."></textarea>
+      <div class="input-field">
+        <label>Notas u Observaciones</label>
+        <textarea id="notes" rows="3" placeholder="Opcional..."></textarea>
       </div>
 
-      <button type="submit" class="save-btn">Guardar Préstamo</button>
+      <button type="submit" class="primary-btn">Guardar Préstamo</button>
     </form>
+  </div>
+
+  <!-- Ventana Flotante / Modal: Detalle del Deudor -->
+  <div class="fullscreen-modal" id="detailModal">
+    <div class="modal-bar">
+      <button class="icon-btn" id="closeDetailBtn">←</button>
+      <h3 id="detailName">Detalle del Deudor</h3>
+    </div>
+    
+    <div class="modal-content" id="detailBody">
+      <!-- Se llena dinámicamente al presionar un nombre -->
+    </div>
   </div>
 
   <script src="script.js"></script>
